@@ -10,7 +10,6 @@ internal class Program
 
         try
         {
-
             
             var j = app.Services.GetService<IDeviceGrpcClient>();
             await j.CreateDeviceAsync("abcdefabcdef");
