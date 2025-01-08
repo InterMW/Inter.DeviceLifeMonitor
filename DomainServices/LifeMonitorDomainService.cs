@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 namespace DomainService;
 
 public interface ILifeMonitorDomainService {
-
+    Task ListenToDevice(string serialNumber);
+    Task VerifyAndUpdate(DateTime now);
 }
 
 public class LifeMonitorDomainService : ILifeMonitorDomainService
@@ -25,6 +26,36 @@ public class LifeMonitorDomainService : ILifeMonitorDomainService
         _deviceClient = deviceClient;
         _lastHeardRepository = lastHeardRepository;
         _logger = logger;
+    }
+
+    public Task ListenToDevice(string serialNumber) => 
+        _lastHeardRepository.WriteDownRecord(serialNumber);
+
+    public async Task VerifyAndUpdate(DateTime now)
+    {
+        await Task.WhenAll(
+            _deviceClient
+            .GetDevicesAsync(CancellationToken.None)
+            .Select(_ => UpdateDevice(_,now))
+            .ToEnumerable());
+    }
+
+    private async Task UpdateDevice(DeviceModel device, DateTime now)
+    {
+        var wasSeen = await _lastHeardRepository.ExistingRecord(device.SerialNumber, now);
+        if(device.IsOnline == wasSeen)
+        {
+            _logger.LogInformation(
+                "Didn't update {_serialNumber} because it was already {_alive}."
+                , device.SerialNumber, wasSeen);
+            return; 
+        }
+
+        _logger.LogInformation(
+            "Updated {_serialNumber} to be {_alive}."
+            , device.SerialNumber, wasSeen);
+
+        await _deviceClient.SetDeviceLifeState(device.SerialNumber, wasSeen);
     }
 
     public async Task MarkAsCurrentlyAwake(string serialNumber)
@@ -64,14 +95,13 @@ public class LifeMonitorDomainService : ILifeMonitorDomainService
                 return;
             }
 
-            var heardFromRecently = await _lastHeardRepository.ExistingRecord(device.SerialNumber);
+            var heardFromRecently = false;//await _lastHeardRepository.ExistingRecord(device.SerialNumber);
 
             if(!deviceIsOnline && !heardFromRecently)
             {
                 try
                 {
                     await _deviceClient.SetDeviceLifeState(device.SerialNumber, false);
-                    //send rabbit message?
                 }
                 catch (DeviceSerialNumberInvalidException)
                 {

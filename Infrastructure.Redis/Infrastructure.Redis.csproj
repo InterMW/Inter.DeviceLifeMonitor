@@ -7,12 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Device.GrpcClient" Version="8.0.31" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    <ProjectReference Include="..\Infrastructure.RepositoryCore\Infrastructure.RepositoryCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.RepositoryCore\Infrastructure.RepositoryCore.csproj" />
+      <PackageReference Include="MelbergFramework.Infrastructure.Redis" Version="8.0.9" />
   </ItemGroup>
 
 </Project>
