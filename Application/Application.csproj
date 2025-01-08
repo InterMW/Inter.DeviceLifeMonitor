@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>b7d57efc-da66-4d9f-ad3f-22458fd8b82b</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Device.Common" Version="8.0.31" />
+    <PackageReference Include="Device.Domain" Version="8.0.31" />
+    <PackageReference Include="Device.GrpcClient" Version="8.0.31" />
+    <PackageReference Include="MelbergFramework.Application" Version="8.0.8" />
+    <PackageReference Include="MelbergFramework.Infrastructure.Redis" Version="8.0.9" />
+    <PackageReference Include="MelbergFramework.Infrastructure.Rabbit" Version="8.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Redis\Infrastructure.Redis.csproj" />
+    <ProjectReference Include="..\DomainServices\DomainServices.csproj" />
+  </ItemGroup>
+
+</Project>
